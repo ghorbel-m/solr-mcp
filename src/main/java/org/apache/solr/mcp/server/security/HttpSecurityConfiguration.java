@@ -16,6 +16,7 @@
  */
 package org.apache.solr.mcp.server.security;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springaicommunity.mcp.security.server.config.McpServerOAuth2Configurer;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +39,9 @@ class HttpSecurityConfiguration {
 
 	@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:}")
 	private String issuerUrl;
+
+	@Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
+	private String allowedOrigins;
 
 	@Bean
 	@ConditionalOnProperty(name = "http.security.enabled", havingValue = "true", matchIfMissing = true)
@@ -69,8 +73,9 @@ class HttpSecurityConfiguration {
 
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOriginPatterns(List.of("*"));
-		configuration.setAllowedMethods(List.of("*"));
+		List<String> origins = Arrays.asList(allowedOrigins.split(","));
+		configuration.setAllowedOrigins(origins);
+		configuration.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true);
 

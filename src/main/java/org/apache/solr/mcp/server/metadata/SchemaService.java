@@ -25,6 +25,7 @@ import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.SchemaRepresentation;
 import org.springaicommunity.mcp.annotation.McpResource;
 import org.springaicommunity.mcp.annotation.McpTool;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -161,6 +162,7 @@ public class SchemaService {
 	 *            the name of the collection to retrieve schema for
 	 * @return JSON string containing the schema representation
 	 */
+	@PreAuthorize("isAuthenticated()")
 	@McpResource(uri = "solr://{collection}/schema", name = "solr-collection-schema", description = "Schema definition for a Solr collection including fields, field types, and copy fields", mimeType = "application/json")
 	public String getSchemaResource(String collection) {
 		try {
@@ -249,6 +251,7 @@ public class SchemaService {
 	 * @see SchemaRequest
 	 * @see org.apache.solr.client.solrj.response.schema.SchemaResponse
 	 */
+	@PreAuthorize("isAuthenticated()")
 	@McpTool(name = "get-schema", description = "Get schema for a Solr collection")
 	public SchemaRepresentation getSchema(String collection) throws Exception {
 		SchemaRequest schemaRequest = new SchemaRequest();

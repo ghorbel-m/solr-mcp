@@ -291,6 +291,7 @@ public class CollectionService {
 	 *
 	 * @return JSON string containing the list of collections
 	 */
+	@PreAuthorize("isAuthenticated()")
 	@McpResource(uri = "solr://collections", name = "solr-collections", description = "List of all Solr collections available in the cluster", mimeType = "application/json")
 	public String getCollectionsResource() {
 		return toJson(objectMapper, listCollections());
@@ -306,6 +307,7 @@ public class CollectionService {
 	 *
 	 * @return list of available collection names for autocompletion
 	 */
+	@PreAuthorize("isAuthenticated()")
 	@McpComplete(uri = "solr://{collection}/schema")
 	public List<String> completeCollectionForSchema() {
 		return listCollections();
@@ -343,6 +345,7 @@ public class CollectionService {
 	 *         them
 	 * @see CollectionAdminRequest.List
 	 */
+	@PreAuthorize("isAuthenticated()")
 	@McpTool(name = "list-collections", description = "List solr collections")
 	public List<String> listCollections() {
 		try {
@@ -437,6 +440,7 @@ public class CollectionService {
 	 * @see LukeRequest
 	 * @see #extractCollectionName(String)
 	 */
+	@PreAuthorize("isAuthenticated()")
 	@McpTool(name = "get-collection-stats", description = "Get stats/metrics on a Solr collection")
 	public SolrMetrics getCollectionStats(
 			@McpToolParam(description = "Solr collection to get stats/metrics for") String collection)

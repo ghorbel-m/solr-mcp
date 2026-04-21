@@ -299,6 +299,7 @@ public class SearchService {
 		return new SearchResponse(documents.getNumFound(), documents.getStart(), documents.getMaxScore(), docs, facets);
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	@McpTool(name = "count", description = "Count documents in a Solr collection matching a query and optional filters. Returns only the total count, not the documents themselves.")
 	public long count(@McpToolParam(description = "Solr collection to query") String collection,
 			@McpToolParam(description = "Solr q parameter. If none specified defaults to \"*:*\"", required = false) String query,

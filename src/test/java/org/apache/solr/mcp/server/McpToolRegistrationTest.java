@@ -83,18 +83,9 @@ class McpToolRegistrationTest {
 		// Find methods with @McpTool annotation
 		List<Method> mcpToolMethods = Arrays.stream(methods).filter(m -> m.isAnnotationPresent(McpTool.class)).toList();
 
-		// Verify at least one method has the annotation
-		assertFalse(mcpToolMethods.isEmpty(),
-				"IndexingService should have at least one method with @McpTool annotation");
-
-		// Verify each tool has proper annotations
-		for (Method method : mcpToolMethods) {
-			McpTool toolAnnotation = method.getAnnotation(McpTool.class);
-			assertNotNull(toolAnnotation.name(), "Tool name should not be null");
-			assertFalse(toolAnnotation.name().isBlank(), "Tool name should not be blank");
-			assertNotNull(toolAnnotation.description(), "Tool description should not be null");
-			assertFalse(toolAnnotation.description().isBlank(), "Tool description should not be blank");
-		}
+		// In this fork, write-access tools (@McpTool) on IndexingService are disabled
+		assertTrue(mcpToolMethods.isEmpty(),
+				"IndexingService write tools are disabled in this fork");
 	}
 
 	@Test

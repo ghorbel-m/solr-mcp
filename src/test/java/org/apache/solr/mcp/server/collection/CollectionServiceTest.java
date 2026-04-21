@@ -204,8 +204,9 @@ class CollectionServiceTest {
 
 	@Test
 	void checkHealth_WithUnhealthyCollection_ShouldReturnUnhealthyStatus() throws Exception {
-		// Given
+		// Given - ping is swallowed; query failure determines unhealthy status
 		when(solrClient.ping("unhealthy_collection")).thenThrow(new SolrServerException("Connection failed"));
+		when(solrClient.query(eq("unhealthy_collection"), any())).thenThrow(new SolrServerException("Connection failed"));
 
 		// When
 		SolrHealthStatus result = collectionService.checkHealth("unhealthy_collection");
@@ -279,7 +280,9 @@ class CollectionServiceTest {
 
 	@Test
 	void checkHealth_IOException() throws Exception {
+		// Given - ping is swallowed; query failure determines unhealthy status
 		when(solrClient.ping("error_collection")).thenThrow(new IOException("Network error"));
+		when(solrClient.query(eq("error_collection"), any())).thenThrow(new IOException("Network error"));
 
 		SolrHealthStatus result = collectionService.checkHealth("error_collection");
 

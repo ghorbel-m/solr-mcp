@@ -1090,8 +1090,9 @@ public class CollectionService {
 	 *             if there are I/O errors during communication
 	 */
 	@PreAuthorize("isAuthenticated()")
-	@McpTool(name = "create-collection", description = "Create a new Solr collection. "
-			+ "configSet defaults to _default, numShards and replicationFactor default to 1.")
+	// @McpTool disabled: write access
+	// @McpTool(name = "create-collection", description = "Create a new Solr collection. "
+	// 		+ "configSet defaults to _default, numShards and replicationFactor default to 1.")
 	public CollectionCreationResult createCollection(
 			@McpToolParam(description = "Name of the collection to create") String name,
 			@McpToolParam(description = "Configset name. Defaults to _default.", required = false) String configSet,

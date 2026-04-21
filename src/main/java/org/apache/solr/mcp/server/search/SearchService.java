@@ -298,4 +298,22 @@ public class SearchService {
 
 		return new SearchResponse(documents.getNumFound(), documents.getStart(), documents.getMaxScore(), docs, facets);
 	}
+
+	@McpTool(name = "count", description = "Count documents in a Solr collection matching a query and optional filters. Returns only the total count, not the documents themselves.")
+	public long count(@McpToolParam(description = "Solr collection to query") String collection,
+			@McpToolParam(description = "Solr q parameter. If none specified defaults to \"*:*\"", required = false) String query,
+			@McpToolParam(description = "Solr fq parameter", required = false) List<String> filterQueries)
+			throws SolrServerException, IOException {
+
+		final SolrQuery solrQuery = new SolrQuery("*:*");
+		if (StringUtils.hasText(query)) {
+			solrQuery.setQuery(query);
+		}
+		if (!CollectionUtils.isEmpty(filterQueries)) {
+			solrQuery.setFilterQueries(filterQueries.toArray(new String[0]));
+		}
+		solrQuery.setRows(0);
+
+		return solrClient.query(collection, solrQuery).getResults().getNumFound();
+	}
 }

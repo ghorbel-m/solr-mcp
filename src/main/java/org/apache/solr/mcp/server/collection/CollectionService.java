@@ -352,7 +352,27 @@ public class CollectionService {
 			@SuppressWarnings("unchecked")
 			List<String> collections = (List<String>) response.getResponse().get(COLLECTIONS_KEY);
 			return collections != null ? collections : new ArrayList<>();
-		} catch (SolrServerException | IOException _) {
+		} catch (SolrServerException | IOException | RuntimeException _) {
+			// RuntimeException covers SolrException ("not running in SolrCloud mode")
+			// for standalone Solr instances — fall back to the Core Admin API.
+			return listCoresStandalone();
+		}
+	}
+
+	/**
+	 * Fallback for standalone (non-SolrCloud) Solr: lists cores via
+	 * {@code /admin/cores?action=STATUS}.
+	 */
+	private List<String> listCoresStandalone() {
+		try {
+			ModifiableSolrParams params = new ModifiableSolrParams();
+			params.set("action", "STATUS");
+			GenericSolrRequest request = new GenericSolrRequest(SolrRequest.METHOD.GET, "/admin/cores", params);
+			NamedList<Object> response = solrClient.request(request);
+			@SuppressWarnings("unchecked")
+			NamedList<Object> status = (NamedList<Object>) response.get("status");
+			return status != null ? new ArrayList<>(status.asShallowMap().keySet()) : new ArrayList<>();
+		} catch (SolrServerException | IOException | RuntimeException _) {
 			return new ArrayList<>();
 		}
 	}
@@ -1013,13 +1033,23 @@ public class CollectionService {
 	@McpTool(name = "check-health", description = "Check health of a Solr collection")
 	public SolrHealthStatus checkHealth(@McpToolParam(description = "Solr collection") String collection) {
 		try {
-			// Ping Solr
-			SolrPingResponse pingResponse = solrClient.ping(collection);
+			// Try ping; some Solr deployments (e.g. missing df param) throw here.
+			// If ping fails we still consider the collection healthy if queries succeed.
+			Long elapsedTime = null;
+			try {
+				SolrPingResponse pingResponse = solrClient.ping(collection);
+				elapsedTime = pingResponse.getElapsedTime();
+			} catch (Exception _) {
+				// ping not available or misconfigured — fall through to query check
+			}
 
 			// Get basic stats
 			QueryResponse statsResponse = solrClient.query(collection, new SolrQuery(ALL_DOCUMENTS_QUERY).setRows(0));
+			if (elapsedTime == null) {
+				elapsedTime = (long) statsResponse.getQTime();
+			}
 
-			return new SolrHealthStatus(true, null, pingResponse.getElapsedTime(),
+			return new SolrHealthStatus(true, null, elapsedTime,
 					statsResponse.getResults().getNumFound(), new Date(), null, null, null);
 
 		} catch (Exception e) {

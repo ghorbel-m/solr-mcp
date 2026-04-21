@@ -81,7 +81,7 @@ class JsonResponseParser extends ResponseParser {
 
 	@Override
 	public Collection<String> getContentTypes() {
-		return List.of(MediaType.APPLICATION_JSON_VALUE);
+		return List.of(MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE);
 	}
 
 	@Override

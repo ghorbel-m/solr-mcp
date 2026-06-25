@@ -447,6 +447,7 @@ public class CollectionService {
 			throws SolrServerException, IOException {
 		// Extract actual collection name from shard name if needed
 		String actualCollection = extractCollectionName(collection);
+		validateCollectionName(actualCollection);
 
 		// Validate collection exists
 		if (!validateCollectionExists(actualCollection)) {
@@ -1107,6 +1108,7 @@ public class CollectionService {
 		if (name == null || name.isBlank()) {
 			throw new IllegalArgumentException(BLANK_COLLECTION_NAME_ERROR);
 		}
+		validateCollectionName(name);
 
 		String effectiveConfigSet = configSet != null ? configSet : DEFAULT_CONFIGSET;
 		int effectiveShards = numShards != null ? numShards : DEFAULT_NUM_SHARDS;
@@ -1116,5 +1118,11 @@ public class CollectionService {
 				.process(solrClient);
 
 		return new CollectionCreationResult(name, true, "Collection created successfully", new Date());
+	}
+
+	private static void validateCollectionName(String name) {
+		if (name != null && !name.matches("[a-zA-Z0-9._-]+")) {
+			throw new IllegalArgumentException("Invalid collection name: " + name);
+		}
 	}
 }

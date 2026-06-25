@@ -104,6 +104,7 @@ public class SearchService {
 
 	public static final String SORT_ITEM = "item";
 	public static final String SORT_ORDER = "order";
+	private static final int MAX_ROWS = 1000;
 	private final SolrClient solrClient;
 
 	/**
@@ -282,7 +283,7 @@ public class SearchService {
 		}
 
 		if (rows != null) {
-			solrQuery.setRows(rows);
+			solrQuery.setRows(Math.min(rows, MAX_ROWS));
 		}
 
 		final QueryResponse queryResponse = solrClient.query(collection, solrQuery);

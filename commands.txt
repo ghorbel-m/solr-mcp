@@ -1,0 +1,10 @@
+To run with integrated demo solr:
+docker compose up -d
+docker run -p 8080:8080 -i --rm --add-host=host.docker.internal:host-gateway -e HTTP_SECURITY_ENABLED=false -e PROFILES=http -e SOLR_URL=http://host.docker.internal:8983/solr/ -e CORS_ALLOWED_ORIGINS=* solr-mcp:latest
+
+To run with solr rubix:
+webshop start
+docker run -p 8080:8080 --rm --network network-uk-up -e HTTP_SECURITY_ENABLED=false -e PROFILES=http -e solr_url=http://solr-uk-up:8983/solr -e CORS_ALLOWED_ORIGINS=* solr-mcp:latest
+
+Run mcp inspector with:
+npx @modelcontextprotocol/inspector http://localhost:8080/mcp
